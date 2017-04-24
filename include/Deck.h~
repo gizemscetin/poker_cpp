@@ -3,9 +3,6 @@
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <random>
-
 using namespace std;
 
 // Attributes of a card object:
@@ -21,10 +18,6 @@ class Card
         int rank() const { return rank_; };
         int suit() const { return suit_; };
 
-        friend bool operator==(const Card& lhs, const Card& rhs){ return (lhs.rank() == rhs.rank()) && (lhs.suit() == rhs.suit()); }
-        friend bool operator!=(const Card& lhs, const Card& rhs){ return !(lhs == rhs); }
-        friend bool operator<(const Card& lhs, const Card& rhs);
-
         friend ostream& operator<<(ostream& os, const Card& card);
 
     private:
@@ -38,14 +31,6 @@ class Deck
     public:
         Deck();
 
-        vector<Card> cards() const { return cards_; };
-        int length() const { return cards_.size(); };
-
-        void shuffle();
-        Card pop();
-        void remove(vector<Card> cards);
-
-        friend ostream& operator<<(ostream& os, const Deck& deck);
 
     private:
         vector<Card> cards_;

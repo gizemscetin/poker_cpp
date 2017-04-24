@@ -1,17 +1,13 @@
 
 
 #include <iostream>
-
 #include "Deck.h"
-#include "Dealer.h"
-#include "Game.h"
 
 using namespace std;
 
 int main()
 {
-    Game G;
-    G.start();
-
+    Card C(2, 3);
+    cout << C << endl;
     return 0;
 }
