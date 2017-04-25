@@ -127,11 +127,12 @@ void Game::play_one_round()
     else
     {
         // Use winner function!!!
-        cout << "TBC.." << endl;
-        //winner_id_ = //ShowHands.Winner(players_[0].pocket_cards(), players_[1].pocket_cards(), D.communitycards());
+        //cout << "TBC.." << endl;
+        winner_id_ = find_winner(players_[0].pocket_cards(), players_[1].pocket_cards(), D.community_cards());
         if(winner_id_ != -1)
         {
-            update_winner_stack();
+            //update_winner_stack();
+            players_[winner_id_].increase_stack(pot_);
         }
         else // -1 -> tie
         {
@@ -170,7 +171,119 @@ void Game::start()
     }
 }
 
-Game::~Game()
+int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards)
 {
-    //dtor
+    HandRank H;
+
+	if ((H.RoyalFlush(P1, CommunityCards))[0].rank() != 0 || (H.RoyalFlush(P2, CommunityCards))[0].rank() != 0) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.RoyalFlush(P1, CommunityCards))[n].rank() > (H.RoyalFlush(P2, CommunityCards))[n].rank()) {
+				return 0; //Player 1 is the Winner (Royal Flush)
+			}
+			if ((H.RoyalFlush(P1, CommunityCards))[n].rank() < (H.RoyalFlush(P2, CommunityCards))[n].rank()) {
+				return 1; //Player 2 is the Winner (Royal Flush)
+			}
+		}
+		return -1; //It's a Tie (Royal Flush)
+	}
+	else if (((H.StraightFlush(P1, CommunityCards))[0].rank() != 0) || ((H.StraightFlush(P2, CommunityCards))[0].rank() != 0)) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.StraightFlush(P1, CommunityCards))[n].rank() > (H.StraightFlush(P2, CommunityCards))[n].rank()) {
+				return 0; //Player 1 is the Winner (Straight Flush)
+			}
+			if ((H.StraightFlush(P1, CommunityCards))[n].rank() < (H.StraightFlush(P2, CommunityCards))[n].rank()) {
+				return 1; //Player 2 is the Winner (Straight Flush)
+			}
+		}
+		return -1; //It's a Tie (Straight Flush)
+	}
+	else if (((H.FourOfAKind(P1, CommunityCards))[0].rank() != 0) || (H.FourOfAKind(P2, CommunityCards))[0].rank() != 0) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.FourOfAKind(P1, CommunityCards))[n].rank() > (H.FourOfAKind(P2, CommunityCards))[n].rank())
+				return 0; //Player 1 is the Winner (Four of a Kind)
+			if ((H.FourOfAKind(P1, CommunityCards))[n].rank() < (H.FourOfAKind(P2, CommunityCards))[n].rank())
+				return 1; //Player 2 is the Winner (Four of a Kind)
+		}
+		return -1; //It's a Tie (Four of a Kind)
+	}
+	else if (((H.FullHouse(P1, CommunityCards))[0].rank() != 0) || ((H.FullHouse(P2, CommunityCards))[0].rank() != 0)) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.FullHouse(P1, CommunityCards))[n].rank() > (H.FullHouse(P2, CommunityCards))[n].rank())
+				return 0; //Player 1 is the Winner (Full House)
+			if ((H.FullHouse(P1, CommunityCards))[n].rank() < (H.FullHouse(P2, CommunityCards))[n].rank())
+				return 1; //Player 2 is the Winner (Full House)
+		}
+		return -1; //It's a Tie (Full House)
+	}
+	else if (((H.Flush(P1, CommunityCards))[0].rank() != 0) || ((H.Flush(P2, CommunityCards))[0].rank() != 0)) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.Flush(P1, CommunityCards))[n].rank() > (H.Flush(P2, CommunityCards))[n].rank())
+				return 0; //Player 1 is the Winner (Flush)
+			if ((H.Flush(P1, CommunityCards))[n].rank() < (H.Flush(P2, CommunityCards))[n].rank())
+				return 1; //Player 2 is the Winner (Flush)
+		}
+		return -1; //It's a Tie (Flush)
+	}
+	else if (((H.Straight(P1, CommunityCards))[0].rank() != 0) || ((H.Straight(P2, CommunityCards))[0].rank() != 0)) {
+		for (int n = 0; n < 5; n++) {
+			if ((H.Straight(P1, CommunityCards))[n].rank() > (H.Straight(P2, CommunityCards))[n].rank())
+				return 0; //Player 1 is the Winner (Straight)
+			if ((H.Straight(P1, CommunityCards))[n].rank() < (H.Straight(P2, CommunityCards))[n].rank())
+				return 1; //Player 2 is the Winner (Straight)
+		}
+		return -1; //It's a Tie (Straight)
+	}
+	else if (((H.ThreeOfAKind(P1, CommunityCards))[0].rank() != 0) || ((H.ThreeOfAKind(P2, CommunityCards))[0].rank() != 0)) {
+		if ((H.ThreeOfAKind(P1, CommunityCards))[0].rank() > (H.ThreeOfAKind(P2, CommunityCards))[0].rank())
+			return 0; //Player 1 is the Winner (Three of a Kind)
+		else if ((H.ThreeOfAKind(P1, CommunityCards))[0].rank() < (H.ThreeOfAKind(P2, CommunityCards))[0].rank())
+			return 1; //Player 2 is the Winner (Three of a Kind)
+		else {
+			for (int n = 0; n < 2; n++) {
+				if ((H.ThreeOfAKind(P1, CommunityCards))[3 + n].rank() > (H.ThreeOfAKind(P2, CommunityCards))[3 + n].rank())
+					return 0; //Player 1 is the Winner (Three of a Kind High Kicker)
+				if ((H.ThreeOfAKind(P1, CommunityCards))[3 + n].rank() < (H.ThreeOfAKind(P2, CommunityCards))[3 + n].rank())
+					return 1; //Player 2 is the Winner (Three of a Kind High Kicker)
+			}
+			return -1; //It's a Tie (Three of a Kind)
+		}
+	}
+	else if ((((H.TwoPair(P1, CommunityCards))[0].rank() != 0) && ((H.TwoPair(P1, CommunityCards))[2].rank() != 0)) || (((H.TwoPair(P2, CommunityCards)[0].rank() != 0)) && (H.TwoPair(P2, CommunityCards)[2].rank() != 0))) {
+		for (int n = 0; n < 4; n++) {
+			if ((H.TwoPair(P1, CommunityCards))[n].rank() > (H.TwoPair(P2, CommunityCards))[n].rank())
+				return 0; //Player 1 is the Winner (Two Pair)
+			if ((H.TwoPair(P1, CommunityCards))[n].rank() < (H.TwoPair(P2, CommunityCards))[n].rank())
+				return 1; //Player 2 is the Winner (Two Pair)
+		}
+		if ((H.TwoPair(P1, CommunityCards))[4].rank() > (H.TwoPair(P2, CommunityCards))[4].rank())
+			return 0; //Player 1 is the Winner (Two Pair High Kicker)
+		else if ((H.TwoPair(P1, CommunityCards))[4].rank() < (H.TwoPair(P2, CommunityCards))[4].rank())
+			return 1; //Player 2 is the Winner (Two Pair High Kicker)
+		else
+			return -1; //It's a Tie (Two Pair)
+	}
+	else if (((H.OnePair(P1, CommunityCards))[0].rank() != 0) || ((H.OnePair(P2, CommunityCards))[0].rank() != 0)) {
+		if ((H.OnePair(P1, CommunityCards))[0].rank() > (H.OnePair(P2, CommunityCards))[0].rank())
+			return 0; //Player 1 is the Winner (One Pair)
+		else if ((H.OnePair(P1, CommunityCards))[0].rank() < (H.OnePair(P2, CommunityCards))[0].rank())
+			return 1; //Player 2 is the Winner (One Pair)
+		else {
+			for (int n = 0; n < 5; n++) {
+				if ((H.HighCard(P1, CommunityCards))[(n)].rank() > (H.HighCard(P2, CommunityCards))[(n)].rank())
+					return 0; //Player 1 is the Winner (One Pair High Kicker)
+				if ((H.HighCard(P1, CommunityCards))[(n)].rank() < (H.HighCard(P2, CommunityCards))[(n)].rank())
+					return 1; //Player 2 is the Winner (One Pair High Kicker)
+			}
+			return -1; //It's a Tie (One Pair)
+		}
+	}
+	else {
+		for (int n = 0; n < 5; n++) {
+			if ((H.HighCard(P1, CommunityCards))[(n)].rank() > (H.HighCard(P2, CommunityCards))[(n)].rank())
+				return 0; //Player 1 is the Winner (High Card)
+			if ((H.HighCard(P1, CommunityCards))[(n)].rank() < (H.HighCard(P2, CommunityCards))[(n)].rank())
+				return 1; //Player 2 is the Winner (High Card)
+		}
+		return -1; //It's a Tie (High Card)
+	}
 }

@@ -5,6 +5,9 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <iterator>
+
+#include <unistd.h>
 
 using namespace std;
 

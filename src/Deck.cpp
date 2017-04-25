@@ -2,7 +2,7 @@
 
 string Ranks[14]    =  {"", "A", "2", "3", "4", "5", "6", "7", "8",
                         "9", "10", "J", "Q", "K"};
-char Suits[4]     = {'C', 'D', 'H', 'S'}; //{'♣', '♦', '♥', '♠'};
+char Suits[4]     = {'C', 'D', 'H', 'S'}; //{U'♣', U'♦', U'♥', U'♠'};
 
 
 bool operator<(const Card& lhs, const Card& rhs)
@@ -39,8 +39,9 @@ Deck::Deck()
 
 void Deck::shuffle()
 {
-    //auto engine = std::default_random_engine();
-    random_shuffle(cards_.begin(), cards_.end()/*, engine*/);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(cards_.begin(), cards_.end(), g);
 }
 Card Deck::pop()
 {

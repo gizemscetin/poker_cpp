@@ -2,9 +2,11 @@
 
 void Dealer::deal_pockets(vector<Player> &players)
 {
+
     // First Card
     for(int i=0; i<players.size(); i++)
     {
+        players[i].clear_cards();
         players[i].add_card(deck_.pop());
     }
 

@@ -21,6 +21,7 @@ class Player
         void set_id(int id) { id_ = id; };
         void set_cards(vector<Card> cards) { pocket_cards_ = cards; };
         void add_card(Card card) { pocket_cards_.push_back(card); };
+        void clear_cards() { pocket_cards_.clear(); };
         void show_pockets();
         void set_blind_type(int blind) { blind_type_ = blind; decrease_stack(blind+1);};
         void increase_stack(int cnt) { stack_ += cnt; };
@@ -40,6 +41,7 @@ class Player
 
         int id() const { return id_; };
         int stack() const { return stack_; };
+        vector<Card> pocket_cards() const { return pocket_cards_; };
 
         friend ostream& operator<<(ostream& os, const Player& player)
         {

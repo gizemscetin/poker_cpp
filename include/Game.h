@@ -3,12 +3,12 @@
 
 #include "Dealer.h"
 #include "Player.h"
+#include "HandRank.h"
 
 class Game
 {
     public:
         Game(int player_count = 2);
-        virtual ~Game();
 
         int pot() const { return pot_; };
 
@@ -19,6 +19,7 @@ class Game
         void play_one_round();
         bool play_one_state(int state);
 
+        int find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards);
         void update_winner_stack();
 
         friend ostream& operator<<(ostream& os, const Game& game)
