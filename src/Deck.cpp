@@ -1,25 +1,11 @@
 #include "Deck.h"
 
-string Ranks[14]    =  {"", "A", "2", "3", "4", "5", "6", "7", "8",
-                        "9", "10", "J", "Q", "K"};
-char Suits[4]     = {'C', 'D', 'H', 'S'}; //{U'♣', U'♦', U'♥', U'♠'};
-
-
-bool operator<(const Card& lhs, const Card& rhs)
+vector<float> Card::get_card_info()
 {
-    //if(lhs.rank() == 1)
-    //    return false;
-    //if(rhs.rank() == 1)
-    //    return true;
-
-    return lhs.rank() < rhs.rank();
+    vector<float> card_info;
+    card_info.push_back(rank_);
+    card_info.push_back(suit_);
 }
-ostream& operator<<(ostream& os, const Card& card)
-{
-    os << "[" << Ranks[card.rank()] << ' ' << Suits[card.suit()] << "]";
-    return os;
-}
-
 
 //////////////////////////////
 
