@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include "Dealer.h"
-#include "Player.h"
 #include "HandRank.h"
 
 class Game

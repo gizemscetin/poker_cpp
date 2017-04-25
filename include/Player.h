@@ -50,6 +50,10 @@ class Player
         };
 
 
+        // To be used for RNN setup:
+        vector<vector<float>> get_network_input();
+
+
     protected:
     private:
 

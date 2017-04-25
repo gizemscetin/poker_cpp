@@ -14,9 +14,7 @@ using namespace std;
 // Attributes of a card object:
 // Rank : {2, 3, ..., 10, 11(J), 12(Q), 13(K), 14(A)}
 // Suit : Club(1), Diamond(2), Heart(3), Spade(4)
-string Ranks[14]    =  {"", "A", "2", "3", "4", "5", "6", "7", "8",
-                        "9", "10", "J", "Q", "K"};
-char Suits[4]     = {'C', 'D', 'H', 'S'}; //{U'♣', U'♦', U'♥', U'♠'};
+
 
 class Card
 {
@@ -31,11 +29,7 @@ class Card
         friend bool operator!=(const Card& lhs, const Card& rhs){ return !(lhs == rhs); }
         friend bool operator<(const Card& lhs, const Card& rhs) {return lhs.rank() < rhs.rank(); };
 
-        friend ostream& operator<<(ostream& os, const Card& card)
-        {
-            os << "[" << Ranks[card.rank()] << ' ' << Suits[card.suit()] << "]";
-            return os;
-        };
+        friend ostream& operator<<(ostream& os, const Card& card);
 
     private:
         int rank_;

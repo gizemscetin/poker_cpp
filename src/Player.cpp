@@ -117,3 +117,26 @@ int Player::decrease_stack_wrt_action(int action)
     }
     return 0;
 }
+
+
+// To be used for RNN setup:
+vector<vector<float>> Player::get_network_input()
+{
+    vector<vector<float>> info;
+
+    // Card 1
+    vector<float> temp = pocket_cards_[0].get_card_info();
+    info.push_back(temp);
+
+    // Card 2
+    temp.clear();
+    temp = pocket_cards_[1].get_card_info();
+    info.push_back(temp);
+
+    // Blind status
+    temp.clear();
+    temp.push_back(blind_type_);
+    info.push_back(temp);
+
+    return info;
+}
