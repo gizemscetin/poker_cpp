@@ -1,6 +1,6 @@
 #include "Dealer.h"
 
-void Dealer::deal_pockets(vector<Player*> &players)
+void Dealer::deal_pockets(vector<Player*> players)
 {
 
     // First Card

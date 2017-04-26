@@ -15,6 +15,7 @@ vector<float> Card::get_card_info()
     vector<float> card_info;
     card_info.push_back(rank_);
     card_info.push_back(suit_);
+    return card_info;
 }
 
 //////////////////////////////

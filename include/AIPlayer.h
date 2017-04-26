@@ -12,13 +12,16 @@ class AIPlayer : public Player
         AIPlayer(string net);
         virtual ~AIPlayer();
 
-        virtual void act(vector<Card> community_cards,
-                       vector<int> opponent_history, int current_pot, int current_state);
+        virtual void act(vector<Card> community_cards, vector<int> opponent_history,
+                         int last_action, int current_pot, int current_state);
+
+
 
     protected:
 
     private:
         NNET *network;
+
 };
 
 #endif // AIPLAYER_H

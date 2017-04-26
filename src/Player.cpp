@@ -21,6 +21,32 @@ void Player::print_possible_actions(vector<int> actions)
     cout << "{ ";
     for(int i=0; i<actions.size(); i++)
         cout << ActionIOMap[actions[i]] << "-" << actions[i] << " ";
+    cout << "} " << endl;
+}
+
+void Player::print_action_history()
+{
+    cout << "Player " << id_ << "'s moves: ";
+    cout << "{ ";
+    for(int i=0; i<action_history_.size(); i++)
+        cout << ActionIOMap[action_history_[i]] << " ";
+    cout << "} " << endl;
+}
+
+void Player::print_opponent_history()
+{
+    cout << "Player " << (3-id_) << "'s moves: ";
+    cout << "{ ";
+    for(int i=0; i<opponent_history_.size(); i++)
+        cout << ActionIOMap[opponent_history_[i]] << " ";
+    cout << "} " << endl;
+}
+
+void Player::print_stack_history()
+{
+    cout << "{ ";
+    for(int i=0; i<stack_history_.size(); i++)
+        cout << stack_history_[i] << " ";
     cout << "} ";
 }
 
@@ -81,13 +107,19 @@ vector<int> Player::find_possible_actions(int state, int last_action)
     return action_set;
 }
 
+int Player::compute_total_win()
+{
+    int total = 0;
+    for(int i=0; i<stack_history_.size(); i++)
+        total += (stack_history_[i] - 1000);
+    return total;
+}
 
-
-void Player::act(vector<Card> community_cards,
-                       vector<int> opponent_history, int current_pot, int state)//(int state, int last_action)
+void Player::act(vector<Card> community_cards, vector<int> opponent_history,
+                 int last_action, int current_pot, int state)//(int state, int last_action)
 {
     //Action Set : {check-0, call-1, bet-2, raise-3, fold-4}
-    vector<int> actions = find_possible_actions(state, *opponent_history.end());//last_action);
+    vector<int> actions = find_possible_actions(state, last_action);
 
     if(actions.size() == 0)
     {

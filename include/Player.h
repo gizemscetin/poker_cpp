@@ -44,7 +44,12 @@ class Player
         vector<int> find_possible_actions(int state, int last_action);
         //virtual void act(int state, int last_action);
 
+        void print_action_history();
+        void print_opponent_history();
+        void print_stack_history();
+
         void add_action(int action) { action_history_.push_back(action); };
+        void add_opponent_action(int action) { opponent_history_.push_back(action); };
 
         int id() const { return id_; };
         int stack() const { return stack_; };
@@ -61,8 +66,15 @@ class Player
 
         // To be used for RNN setup:
         vector<vector<float>> get_network_input();
-        virtual void act(vector<Card> community_cards,
-                       vector<int> opponent_history, int current_pot, int current_state);
+        virtual void act(vector<Card> community_cards, vector<int> opponent_history,
+                        int last_action, int current_pot, int current_state);
+
+        vector<int> stack_history() const { return stack_history_; };
+        void reset_stack() {
+            //cout << " dsljf" << endl;
+            stack_history_.push_back(stack_);
+            stack_ = 1000; };
+        int compute_total_win();
 
     protected:
     private:
@@ -71,9 +83,11 @@ class Player
         vector<Card> pocket_cards_;
 		int stack_ = 1000;
 		vector<int> action_history_;
+		vector<int> opponent_history_;
 		int last_action_ = -1;
 		int blind_type_; // 0 for small, 1 for big
 		int raise_ctr_;
+		vector<int> stack_history_;
 };
 
 

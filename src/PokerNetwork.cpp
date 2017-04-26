@@ -3,7 +3,7 @@
 PokerNetwork::PokerNetwork()
 {
     max_score = 0;
-    population_size = 30;
+    population_size = 10;
     mutation_rate = 0.05;
 
     InputLayer *il1 = new InputLayer(4, "input_hand");
@@ -43,9 +43,9 @@ PokerNetwork::PokerNetwork()
         population.push_back(p1);
     }
 
-    delete il1, il2;
-    delete rl1, rl2, rl3, rl4;
-    delete ol;
+    //delete il1, il2;
+    //delete rl1, rl2, rl3, rl4;
+    //delete ol;
 }
 
 PokerNetwork::~PokerNetwork()
