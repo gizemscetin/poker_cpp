@@ -2,12 +2,13 @@
 #define DEALER_H
 
 #include "Player.h"
+#include "AIPlayer.h"
 class Dealer
 {
     public:
         Dealer() { deck_.shuffle(); };
 
-        void deal_pockets(vector<Player> &players);
+        void deal_pockets(vector<Player*> &players);
         void deal_flop();
         void deal_turn();
         void deal_river();

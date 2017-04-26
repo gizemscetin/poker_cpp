@@ -1,12 +1,11 @@
 #include "Game.h"
 
-Game::Game(int player_count)
+Game::Game(Player *pl1, Player *pl2)
+//(int player_count)
 {
     // Create players
-    for(int i=1; i<=player_count; i++)
-    {
-        players_.push_back(Player(i));
-    }
+    players_.push_back(pl1);
+    players_.push_back(pl2);
 }
 
 void Game::show_status()
@@ -14,7 +13,7 @@ void Game::show_status()
     cout << *this << endl;
     for(int i=0; i<players_.size(); i++)
     {
-        cout << players_[i] << endl;
+        cout << *players_[i] << endl;
     }
 }
 
@@ -22,20 +21,34 @@ void Game::show_player_pockets()
 {
     for(int i=0; i<players_.size(); i++)
     {
-        cout << "Player " << players_[i].id() << " : ";
-        players_[i].show_pockets();
+        cout << "Player " << players_[i]->id() << " : ";
+        players_[i]->show_pockets();
     }
 }
 
-bool Game::play_one_state(int state)
+/*
+void Game::player_act(OrganicNNet::NNET *network, int state)
+{
+    vector<float> input1 = players_[0]->pocket_cards()[0].get_card_info();
+    vector<float> input2 = players_[0]->pocket_cards()[1].get_card_info();
+    vector<float> input3;
+    input3.push_back(players_[0]->blind_type());
+
+
+}
+*/
+bool Game::play_one_state(vector<Card> community_cards, int state)
 {
     int last_action = -1;
     int player_turn = 0;
-    Player* P = &players_[0];
+    Player* P = players_[0];
+    Player* P2 = players_[1];
 
     while(last_action != fold)
     {
-        P->act(state, last_action);
+        // MAKE THE FOLLOWING AUTOMATED
+        //P->act(state, last_action);
+        P->act(community_cards, P2->action_history(), pot_, state);
 
         if(P->last_action() == -1) // No more turns left, so go to the next state
             break;
@@ -61,7 +74,8 @@ bool Game::play_one_state(int state)
 
         // Update the counter
         player_turn++;
-        P = &players_[player_turn%2];
+        P = players_[player_turn%2];
+        P2 = players_[(player_turn+1)%2];
 
         if(last_action == fold)
         {
@@ -76,9 +90,9 @@ void Game::update_winner_stack()
 {
     for(int i=0; i<players_.size(); i++)
     {
-        if(players_[i].check_id(winner_id_+1))
+        if(players_[i]->check_id(winner_id_+1))
         {
-            players_[i].increase_stack(pot_);
+            players_[i]->increase_stack(pot_);
             break;
         }
     }
@@ -91,27 +105,27 @@ void Game::play_one_round()
 
     winner_id_ = -1;        // -1 -> tie, 0 -> player 1, 1 -> player 2
 
-    players_[0].set_blind_type(0);
-    players_[1].set_blind_type(1);
+    players_[0]->set_blind_type(0);
+    players_[1]->set_blind_type(1);
 
     show_status();
 
     D.deal_pockets(players_);
     show_player_pockets();
 
-    if(play_one_state(0))   // Pre-flop
+    if(play_one_state(D.community_cards(), 0))   // Pre-flop
     {
         D.deal_flop();
         cout << D << endl;
         show_status();
 
-        if(play_one_state(1))   // Pre-turn
+        if(play_one_state(D.community_cards(), 1))   // Pre-turn
         {
             D.deal_turn();
             cout << D << endl;
             show_status();
 
-            if(play_one_state(1))   // Pre-river
+            if(play_one_state(D.community_cards(), 1))   // Pre-river
             {
                 D.deal_river();
                 cout << D << endl;
@@ -128,16 +142,16 @@ void Game::play_one_round()
     {
         // Use winner function!!!
         //cout << "TBC.." << endl;
-        winner_id_ = find_winner(players_[0].pocket_cards(), players_[1].pocket_cards(), D.community_cards());
+        winner_id_ = find_winner(players_[0]->pocket_cards(), players_[1]->pocket_cards(), D.community_cards());
         if(winner_id_ != -1)
         {
             //update_winner_stack();
-            players_[winner_id_].increase_stack(pot_);
+            players_[winner_id_]->increase_stack(pot_);
         }
         else // -1 -> tie
         {
-            players_[0].increase_stack(pot_/2);
-            players_[1].increase_stack(pot_/2);
+            players_[0]->increase_stack(pot_/2);
+            players_[1]->increase_stack(pot_/2);
         }
     }
 
@@ -159,7 +173,7 @@ void Game::start()
 		//Check game over conditions:
         for(int i=0; i<players_.size(); i++)
         {
-            if(players_[i].lost())
+            if(players_[i]->lost())
                 game_end = true;
         }
 

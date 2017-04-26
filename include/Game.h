@@ -4,10 +4,17 @@
 #include "Dealer.h"
 #include "HandRank.h"
 
+#include "PokerNetwork.h"
+
+using namespace OrganicNNet;
+
 class Game
 {
     public:
-        Game(int player_count = 2);
+        //Game(int player_count = 2);
+        Game(Player *pl1, Player *pl2);
+
+        vector<Player*> players() const { return players_; };
 
         int pot() const { return pot_; };
 
@@ -16,7 +23,7 @@ class Game
 
         void start();
         void play_one_round();
-        bool play_one_state(int state);
+        bool play_one_state(vector<Card> community_cards, int state);
 
         int find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards);
         void update_winner_stack();
@@ -26,11 +33,17 @@ class Game
             os << "\n\t[Pot: " << game.pot() << "]";
             return os;
         };
+
+
+        // NETWORK
+        //void player_act(NNET *network, int state);
+
     protected:
     private:
-        vector<Player> players_;
+        vector<Player*> players_;
         int pot_ = 0;
         int winner_id_;
+        PokerNetwork network_;
 };
 
 #endif // GAME_H

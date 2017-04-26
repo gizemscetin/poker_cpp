@@ -1,19 +1,19 @@
 #include "Dealer.h"
 
-void Dealer::deal_pockets(vector<Player> &players)
+void Dealer::deal_pockets(vector<Player*> &players)
 {
 
     // First Card
     for(int i=0; i<players.size(); i++)
     {
-        players[i].clear_cards();
-        players[i].add_card(deck_.pop());
+        players[i]->clear_cards();
+        players[i]->add_card(deck_.pop());
     }
 
     // Second Card
     for(int i=0; i<players.size(); i++)
     {
-        players[i].add_card(deck_.pop());
+        players[i]->add_card(deck_.pop());
     }
 }
 void Dealer::deal_flop()

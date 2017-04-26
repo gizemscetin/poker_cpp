@@ -34,7 +34,7 @@ vector<int> Player::find_possible_actions(int state, int last_action)
         if(state == 0) // Pre-flop
         {
             action_set.push_back(call);
-            action_set.push_back(raise);
+            action_set.push_back(Raise);
             action_set.push_back(fold);
             return action_set;
         }
@@ -55,7 +55,7 @@ vector<int> Player::find_possible_actions(int state, int last_action)
     {
         {
             action_set.push_back(call);
-            action_set.push_back(raise);
+            action_set.push_back(Raise);
             action_set.push_back(fold);
             return action_set;
         }
@@ -83,10 +83,11 @@ vector<int> Player::find_possible_actions(int state, int last_action)
 
 
 
-void Player::act(int state, int last_action)
+void Player::act(vector<Card> community_cards,
+                       vector<int> opponent_history, int current_pot, int state)//(int state, int last_action)
 {
     //Action Set : {check-0, call-1, bet-2, raise-3, fold-4}
-    vector<int> actions = find_possible_actions(state, last_action);
+    vector<int> actions = find_possible_actions(state, *opponent_history.end());//last_action);
 
     if(actions.size() == 0)
     {
@@ -139,4 +140,13 @@ vector<vector<float>> Player::get_network_input()
     info.push_back(temp);
 
     return info;
+}
+
+
+
+vector<float> OneHotEncode(int index, int length)
+{
+    vector<float> encoded(length, 0);
+    encoded[index] = 1;
+    return encoded;
 }

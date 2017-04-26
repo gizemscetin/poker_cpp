@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "OrganicNNet/Organism.hpp"
+#include "OrganicNNet/RandomFloat.hpp"
 
 using namespace std;
 using namespace OrganicNNet;
@@ -15,19 +16,12 @@ class PokerNetwork
 
         void next_population();
 
-    protected:
-    private:
+        float max_score;
+        string net_str;
+        float mutation_rate;
+        unsigned population_size;
 
-        float max_score_;
-        string net_str_;
-
-        vector<pair<float, Organism>> population_;
-
-        InputLayer *il1 = nullptr, *il2 = nullptr;
-        RecurrentLayer *rl1 = nullptr, *rl2 = nullptr, *rl3 = nullptr;
-        ComputeLayer *cl1 = nullptr, *cl2 = nullptr, *cl3 = nullptr, *cl4 = nullptr, *cl5 = nullptr;
-        ComputeLayer *ol = nullptr;
-
+        vector<pair<float, Organism>> population;
 };
 
 #endif // POKERNETWORK_H
