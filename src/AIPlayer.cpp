@@ -34,18 +34,29 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
             input_hand.push_back(pocket_cards()[1].rank());
             input_hand.push_back(pocket_cards()[1].suit());
 
-            network->all_layers["input_hand"]->setActivations(input_hand);
+            int err = network->all_layers["input_hand"]->setActivations(input_hand);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(12);
+            }
 
             vector<float> input_blind;
             input_blind.push_back(blind_type());
-            network->all_layers["input_blind"]->setActivations(input_blind);
+            err = network->all_layers["input_blind"]->setActivations(input_blind);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(13);
+            }
 
 
             // rl4
             vector<vector<float>> rec_pot(1);
             rec_pot[0].push_back(current_pot);
-            ((RecurrentLayer*)network->all_layers["rec_pot"])->setInputs(rec_pot);
-
+            err = ((RecurrentLayer*)network->all_layers["rec_pot"])->setInputs(rec_pot);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(14);
+            }
 
             // rl1
             vector<vector<float>> rec_community;
@@ -53,8 +64,11 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
             {
                 rec_community.push_back(community_cards[i].get_card_info());
             }
-            ((RecurrentLayer*)network->all_layers["rec_community"])->setInputs(rec_community);
-
+            err = ((RecurrentLayer*)network->all_layers["rec_community"])->setInputs(rec_community);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(15);
+            }
 
             // rl2
             vector<vector<float>> rec_self_act;
@@ -62,8 +76,11 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
             {
                 rec_self_act.push_back(OneHotEncode(action_history()[i], 5));
             }
-            ((RecurrentLayer*)network->all_layers["rec_self_act"])->setInputs(rec_self_act);
-
+            err = ((RecurrentLayer*)network->all_layers["rec_self_act"])->setInputs(rec_self_act);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(16);
+            }
 
             // rl3
             vector<vector<float>> rec_opp_act;
@@ -71,8 +88,11 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
             {
                 rec_opp_act.push_back(OneHotEncode(opponent_history[i], 5));
             }
-            ((RecurrentLayer*)network->all_layers["rec_opp_act"])->setInputs(rec_opp_act);
-
+            err = ((RecurrentLayer*)network->all_layers["rec_opp_act"])->setInputs(rec_opp_act);
+            if(err != OrganicNNet::GeneralError::None){
+                cout << OrganicNNet::GeneralError::what(err) << endl;
+                exit(17);
+            }
 
             // OUTPUT
             //cout << 1 << endl;
