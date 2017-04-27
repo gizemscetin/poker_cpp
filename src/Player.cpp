@@ -128,6 +128,8 @@ void Player::act(vector<Card> community_cards, vector<int> opponent_history,
     else
     {
         // Ask for I/O input
+        cout <<"\t\t";
+        show_pockets();
         print_possible_actions(actions);
         cout << "Player " << id_ << " : ";
         cin >> last_action_;

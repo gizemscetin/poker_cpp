@@ -2,7 +2,7 @@
 
 string Ranks[14]    =  {"", "A", "2", "3", "4", "5", "6", "7", "8",
                         "9", "10", "J", "Q", "K"};
-char Suits[4]     = {'C', 'D', 'H', 'S'}; //{U'♣', U'♦', U'♥', U'♠'};
+char32_t Suits[4]     = /*{'C', 'D', 'H', 'S'};*/ {'♣', '♦', '♥', '♠'};
 
 ostream& operator<<(ostream& os, const Card& card)
 {

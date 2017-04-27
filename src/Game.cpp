@@ -42,7 +42,7 @@ void Game::player_act(OrganicNNet::NNET *network, int state)
 
 }
 */
-bool Game::play_one_state(vector<Card> community_cards, int state)
+bool Game::play_one_state(vector<Card> community_cards, int state, bool io_on)
 {
     int last_action = -1;
     int player_turn = 0;
@@ -53,22 +53,17 @@ bool Game::play_one_state(vector<Card> community_cards, int state)
     while(last_action != fold)
     {
         // MAKE THE FOLLOWING AUTOMATED
-        //P->act(state, last_action);
-
         P->act(community_cards, P2->action_history(), last_action, pot_, state);
-
 
         if(P->last_action() == -1) // No more turns left, so go to the next state
             break;
 
-        P->print_last_action();
-
+        if(io_on)
+            P->print_last_action();
 
         // Update the new last action
 		last_action = P->last_action();
 		P->add_action(last_action);
-		//P->print_action_history();
-
 
 		// Update the current stack according to the action
         pot_ += P->decrease_stack_wrt_action(last_action);
@@ -83,9 +78,7 @@ bool Game::play_one_state(vector<Card> community_cards, int state)
                 last_action = 2;
         }
 
-
         // Update the counter
-
         player_turn++;
         P = players_[player_turn%2];
         P2 = players_[(player_turn+1)%2];
@@ -93,13 +86,9 @@ bool Game::play_one_state(vector<Card> community_cards, int state)
         if(last_action == fold)
         {
             winner_id_ = P->id() - 1;    // 0 -> player 1, 1 -> player 2
-
-            //cout << "sk;askd1" << endl;
             return false;
         }
-
     }
-    //cout << "sk;askd2" << endl;
     return true;
 }
 
@@ -115,100 +104,92 @@ void Game::update_winner_stack()
     }
 }
 
-void Game::play_one_round()
+void Game::play_one_round(bool io_on)
 {
     Dealer D;				// Create new dealer for every round
     pot_ = 3;				// Clear the pot by setting it to small + big blinds
 
     winner_id_ = -1;        // -1 -> tie, 0 -> player 1, 1 -> player 2
 
-    show_status();
-    //cout << "A" << endl;
+    if(io_on)
+        show_status();
+
     players_[0]->set_blind_type(0);
     players_[1]->set_blind_type(1);
-    //cout << "B" << endl;
-
-    //show_status();
-
-
     D.deal_pockets(players_);
-    //show_player_pockets();
 
-
-    if(play_one_state(D.community_cards(), 0))   // Pre-flop
+    if(play_one_state(D.community_cards(), 0, io_on))   // Pre-flop
     {
         D.deal_flop();
-        //cout << D << endl;
-        //show_status();
-
-        if(play_one_state(D.community_cards(), 1))   // Pre-turn
+        if(io_on)
+            cout << D << endl;
+        if(play_one_state(D.community_cards(), 1, io_on))   // Pre-turn
         {
             D.deal_turn();
-            //cout << D << endl;
-            //show_status();
-
-            if(play_one_state(D.community_cards(), 1))   // Pre-river
+            if(io_on)
+                cout << D << endl;
+            if(play_one_state(D.community_cards(), 1, io_on))   // Pre-river
             {
                 D.deal_river();
-                //cout << D << endl;
+                if(io_on)
+                    cout << D << endl;
             }
         }
     }
 
-
     // Find the winner of the round
-    cout << "Winner_id : " << winner_id_ << endl;
     if(winner_id_ != -1)
     {
-        cout << "Winner : Player " << winner_id_+1 << " -> " << pot_ << endl;
+        if(io_on)
+            cout << "Winner : Player " << winner_id_+1 << " -> " << pot_ << endl;
         update_winner_stack();
     }
     else
     {
-        // Use winner function!!!
-        //cout << "TBC.." << endl;
-        winner_id_ = find_winner(players_[0]->pocket_cards(), players_[1]->pocket_cards(), D.community_cards());
-        cout << "Winner_id : " << winner_id_ << endl;
+        winner_id_ = find_winner(players_[0]->pocket_cards(), players_[1]->pocket_cards(), D.community_cards(), io_on);
+
+        if(io_on)
+        {
+            show_player_pockets();
+            show_status();
+        }
+
         if(winner_id_ != -1)
         {
-            cout << "Winner : Player " << players_[winner_id_]->id() << " -> " << pot_ << endl;
-            //update_winner_stack();
-            //cout << "Increasing stack. " << endl;
+            if(io_on)
+                cout << "Winner : Player " << players_[winner_id_]->id() << " -> " << pot_ << endl;
             players_[winner_id_]->increase_stack(pot_);
-            //cout << "Increased stack. " << endl;
         }
         else // -1 -> tie
         {
-            cout << "It's a tie. -> " << pot_ << endl;
-            //cout << "Splitting stack. " << endl;
+            if(io_on)
+                cout << "It's a tie. -> " << pot_ << endl;
             players_[0]->increase_stack(pot_/2);
             players_[1]->increase_stack(pot_/2);
-            //cout << "Splitted stack. " << endl;
         }
     }
 
-    show_status();
+    if(io_on)
+        show_status();
 }
 
-void Game::start()
+void Game::start(bool io_on)
 {
     bool game_end = false;
 	int	round_cnt = 0;
 
-    while(round_cnt < 3)
+    while(round_cnt < 5)
     {
-        cout << "\n----------------------------------------------------\n";
-        cout << "\t\t***Round " << round_cnt+1 << "***" << endl;
-        try
+        if(io_on)
         {
-            play_one_round();
-            //cout << "No problem." << endl;
+            cout << "\n----------------------------------------------------\n";
+            cout << "\t\t***Round " << round_cnt+1 << "***" << endl;
         }
-        catch(exception &e)
-        {
-            cout << "Problem in  start()." << endl;
-        }
-        cout << "\n----------------------------------------------------\n";
+
+        play_one_round(io_on);
+
+        if(io_on)
+            cout << "\n----------------------------------------------------\n";
 
         // Before going into the next round, do a few things!
 		//Check game over conditions:
@@ -219,23 +200,24 @@ void Game::start()
                 game_end = true;
         }
         */
-        // Clear cards for the next round:
 
 		// Switch players for the next round:
         reverse(players_.begin(), players_.end());
-        //cout << "Reverse success. " << endl;
         round_cnt += 1;
     }
-    show_status();
+
+    if(io_on)
+        show_status();
 }
 
-int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards)
+int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards, bool io_on)
 {
-    cout << P1[0] << P1[1] << endl << P2[0] << P2[1] << endl;
-    cout << CommunityCards[0]<< CommunityCards[1]<< CommunityCards[2]<< CommunityCards[3]<< CommunityCards[4] << endl;
+    if(io_on)
+    {
+        //cout << P1[0] << P1[1] << endl << P2[0] << P2[1] << endl;
+        //cout << CommunityCards[0]<< CommunityCards[1]<< CommunityCards[2]<< CommunityCards[3]<< CommunityCards[4] << endl;
+    }
     HandRank H;
-    //cout << "Start find_winner " << endl;
-
 
     vector<Card> pl1_best, pl2_best;
     int result;
@@ -245,7 +227,8 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
     {
-        cout << "Royal Flush" << endl;
+        if(io_on)
+            cout << "Royal Flush" << endl;
         if(pl1_best[0].rank() > pl2_best[0].rank())
         {
             result = 0;
@@ -264,7 +247,8 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
         if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
         {
-            cout << "Straight Flush" << endl;
+            if(io_on)
+                cout << "Straight Flush" << endl;
             if(pl1_best[0].rank() > pl2_best[0].rank())
             {
                 result = 0;
@@ -284,7 +268,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
             if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
             {
-                cout << "Four Of A Kind" << endl;
+                if(io_on) cout << "Four Of A Kind" << endl;
                 if(pl1_best[0].rank() > pl2_best[0].rank())
                 {
                     result = 0;
@@ -303,7 +287,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                 if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                 {
-                    cout << "Full House" << endl;
+                    if(io_on) cout << "Full House" << endl;
                     if(pl1_best[0].rank() > pl2_best[0].rank())
                     {
                         result = 0;
@@ -322,7 +306,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                     {
-                        cout << "Flush" << endl;
+                        if(io_on) cout << "Flush" << endl;
                         if(pl1_best[0].rank() > pl2_best[0].rank())
                         {
                             result = 0;
@@ -341,7 +325,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                         if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                         {
-                            cout << "Straight" << endl;
+                            if(io_on) cout << "Straight" << endl;
                             if(pl1_best[0].rank() > pl2_best[0].rank())
                             {
                                 result = 0;
@@ -360,7 +344,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                             if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                             {
-                                cout << "Three of a kind" << endl;
+                                if(io_on) cout << "Three of a kind" << endl;
                                 if(pl1_best[0].rank() > pl2_best[0].rank())
                                 {
                                     result = 0;
@@ -390,7 +374,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                                 if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                                 {
-                                    cout << "Two Pairs" << endl;
+                                    if(io_on) cout << "Two Pairs" << endl;
                                     if(pl1_best[0].rank() > pl2_best[0].rank())
                                     {
                                         result = 0;
@@ -401,16 +385,27 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
                                     }
                                     else // Check Kicker
                                     {
-                                        if(pl1_best[4].rank() > pl2_best[4].rank())
+                                        if(pl1_best[2].rank() > pl2_best[2].rank())
                                         {
                                             result = 0;
                                         }
-                                        else if(pl1_best[4].rank() < pl2_best[4].rank())
+                                        else if(pl1_best[2].rank() < pl2_best[2].rank())
                                         {
                                             result = 1;
                                         }
-                                        else
-                                            result = -1;
+                                        else // Check Kicker
+                                        {
+                                            if(pl1_best[4].rank() > pl2_best[4].rank())
+                                            {
+                                                result = 0;
+                                            }
+                                            else if(pl1_best[4].rank() < pl2_best[4].rank())
+                                            {
+                                                result = 1;
+                                            }
+                                            else
+                                                result = -1;
+                                        }
                                     }
                                 }
                                 else
@@ -420,7 +415,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                                     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                                     {
-                                        cout << "One Pair" << endl;
+                                        if(io_on) cout << "One Pair" << endl;
                                         if(pl1_best[0].rank() > pl2_best[0].rank())
                                         {
                                             result = 0;
@@ -449,7 +444,7 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
                                         pl2_best = H.HighCard(P2, CommunityCards);
                                         if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                                         {
-                                            cout << "High Card" << endl;
+                                            if(io_on) cout << "High Card" << endl;
                                             if(pl1_best[0].rank() > pl2_best[0].rank())
                                             {
                                                 result = 0;

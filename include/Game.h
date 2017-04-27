@@ -21,11 +21,11 @@ class Game
         void show_status();
         void show_player_pockets();
 
-        void start();
-        void play_one_round();
-        bool play_one_state(vector<Card> community_cards, int state);
+        void start(bool io_on);
+        void play_one_round(bool io_on);
+        bool play_one_state(vector<Card> community_cards, int state, bool io_on);
 
-        int find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards);
+        int find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards, bool io_on);
         void update_winner_stack();
 
         friend ostream& operator<<(ostream& os, const Game& game)
