@@ -18,7 +18,7 @@ int main()
 
     unsigned pop = 0;
 
-    while (pop < 1)
+    while (pop < 2)
     {
         pop++;
         cout << endl << "*** Population: " << pop << endl << endl;
@@ -50,25 +50,16 @@ int main()
             PNet.population[i].first = sum_of_earnings;
         }
 
-        std::sort(
-                PNet.population.begin(), PNet.population.end(),
-                [](const std::pair<float, Organism> &x,
-                   const std::pair<float, Organism> &y) { return x.first > y.first; });
-        cout << " -Pop best: " << PNet.population[0].first << endl;
-
-        //PNet.next_population();
+        PNet.next_population();
     }
 
-    NNET *net = &(PNet.population[0].second.neural_net);
+    Organism best(PNet.net_str);
+    NNET *net = &best.neural_net;
     AIPlayer pl1(net->serialize());
 
     Player pl2;
     Game G(&pl1, &pl2);
     G.start(true);
-
-    //Organism best(PNet.net_str);
-
-
 
     return 0;
 }
