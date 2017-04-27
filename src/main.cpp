@@ -47,6 +47,7 @@ int main()
                 G.start();
 
                 pl1.reset_stack();
+                pl1.reset_history();
                 //pl2.reset_stack();
                 cout << "\t***END***\tAI " << i << " vs AI " << j << "\t***END***" << endl << endl << endl;
             }

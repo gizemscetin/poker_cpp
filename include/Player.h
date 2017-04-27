@@ -70,11 +70,12 @@ class Player
                         int last_action, int current_pot, int current_state);
 
         vector<int> stack_history() const { return stack_history_; };
+
         void reset_stack() {
-            //cout << " dsljf" << endl;
             stack_history_.push_back(stack_);
             stack_ = 1000; };
         int compute_total_win();
+        void reset_history() { action_history_.clear(); };
 
     protected:
     private:

@@ -33,6 +33,7 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
             input_hand.push_back(pocket_cards()[0].suit());
             input_hand.push_back(pocket_cards()[1].rank());
             input_hand.push_back(pocket_cards()[1].suit());
+            //cout << "Input hand : " << input_hand.size() << endl;
 
             int err = network->all_layers["input_hand"]->setActivations(input_hand);
             if(err != OrganicNNet::GeneralError::None){
@@ -42,6 +43,8 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
 
             vector<float> input_blind;
             input_blind.push_back(blind_type());
+            //cout << "Input blind : " << input_blind.size() << endl;
+
             err = network->all_layers["input_blind"]->setActivations(input_blind);
             if(err != OrganicNNet::GeneralError::None){
                 cout << OrganicNNet::GeneralError::what(err) << endl;
@@ -93,6 +96,7 @@ void AIPlayer::act(vector<Card> community_cards, vector<int> opponent_history,
                 cout << OrganicNNet::GeneralError::what(err) << endl;
                 exit(17);
             }
+
 
             // OUTPUT
             //cout << 1 << endl;
