@@ -1,5 +1,9 @@
 #include "HandRank.h"
 
+string HandRankIOMap[] = {"High Card", "One Pair", "Two Pairs", "Three of a Kind",
+                        "Straight", "Flush", "Full House", "Four of a Kind",
+                        "Straight Flush", "Royal Flush"};
+
 vector<Card> HandRank::RoyalFlush(vector<Card> player, vector<Card> CommunityCards) {
 	vector<Card>ordered;
 	vector<Card>best;
@@ -34,31 +38,40 @@ vector<Card> HandRank::StraightFlush(vector<Card> player, vector<Card> Community
 	}
 }
 
-vector<Card> HandRank::FourOfAKind(vector<Card> player, vector<Card> CommunityCards) {
-	vector<Card>ordered;
+vector<Card> HandRank::FourOfAKind(vector<Card> player, vector<Card> CommunityCards)
+{
+    vector<Card>ordered;
 	vector<Card>best;
 	best.reserve(5);
 	ordered.reserve(7);
 	ordered.insert(ordered.end(), player.begin(), player.end());
 	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
+
+	for(int i=0; i<ordered.size(); i++)
+	{
+        if(ordered[i].rank() == 1)
+        {
+            ordered[i].set_rank(14);
+        }
+	}
+
 	sort(ordered.begin(), ordered.end());
-	for (int y = 0; y < 4; y++) {
-		if ((ordered[y + 3].rank() == ordered[y + 2].rank()) && (ordered[y + 2].rank() == ordered[y + 1].rank()) && (ordered[y + 1].rank() == ordered[y].rank())) {
-			if (ordered[y].rank() == 1) {
-				best.insert(best.begin(), 4, { 14, 0 });
-				best.insert(best.end(), ordered[6]);
-				return best;
-			}
-			else {
-				best.insert(best.begin(), 4, { ordered[y].rank(), 0 });
-				if (ordered[6].rank() != ordered[y].rank())
-					best.insert(best.end(), 1, ordered[6]);
-				else
-					best.insert(best.end(), 1, ordered[2]);
-				return best;
-			}
+	reverse(ordered.begin(), ordered.end());
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (ordered[i].rank() == ordered[i + 1].rank()
+            && ordered[i + 1].rank() == ordered[i + 2].rank()
+            && ordered[i + 2].rank() == ordered[i + 3].rank())
+		{
+            best.insert(best.begin(), ordered.begin() + i, ordered.begin() + (i + 4));
+            ordered.erase(ordered.begin() + i, ordered.begin() + (i + 4));
+            best.push_back(ordered[0]);
+
+            return best;
 		}
 	}
+
 	best.insert(best.begin(), 5, { 0,0 });
 	return best;
 }
@@ -89,7 +102,8 @@ vector<Card> HandRank::FullHouse(vector<Card> player, vector<Card> CommunityCard
 	return best;
 }
 
-vector<Card> HandRank::Flush(vector<Card> player, vector<Card> CommunityCards) {
+vector<Card> HandRank::Flush(vector<Card> player, vector<Card> CommunityCards)
+{
 	vector<Card>best;
 	best.reserve(5);
 	int club = 0;
@@ -101,43 +115,55 @@ vector<Card> HandRank::Flush(vector<Card> player, vector<Card> CommunityCards) {
 	vector<Card>heart_cardranks;
 	vector<Card>spade_cardranks;
 	vector<Card>nothing;
-	for (int y = 0; y < 2; y++) {
-		if (player[y].suit() == 1) {
+
+	for (int y = 0; y < 2; y++)
+	{
+		if (player[y].suit() == 1)
+		{
 			club++;
 			club_cardranks.insert(club_cardranks.begin(), { player[y].rank(), 1 });
 		}
-		else if (player[y].suit() == 2) {
+		else if (player[y].suit() == 2)
+		{
 			diamond++;
 			diamond_cardranks.insert(diamond_cardranks.begin(), { player[y].rank(), 2 });
 		}
-		else if (player[y].suit() == 3) {
+		else if (player[y].suit() == 3)
+		{
 			heart++;
 			heart_cardranks.insert(heart_cardranks.begin(), { player[y].rank(), 3 });
 		}
-		else {
+		else
+		{
 			spade++;
 			spade_cardranks.insert(spade_cardranks.begin(), { player[y].rank(), 4 });
 		}
 	}
-	for (int x = 0; x < 5; x++) {
-		if (CommunityCards[x].suit() == 1) {
+	for (int x = 0; x < 5; x++)
+	{
+		if (CommunityCards[x].suit() == 1)
+		{
 			club++;
 			club_cardranks.insert(club_cardranks.begin(), { CommunityCards[x].rank() , 1 });
 		}
-		else if (CommunityCards[x].suit() == 2) {
+		else if (CommunityCards[x].suit() == 2)
+		{
 			diamond++;
 			diamond_cardranks.insert(diamond_cardranks.begin(), { CommunityCards[x].rank(), 2 });
 		}
-		else if (CommunityCards[x].suit() == 3) {
+		else if (CommunityCards[x].suit() == 3)
+		{
 			heart++;
 			heart_cardranks.insert(heart_cardranks.begin(), { CommunityCards[x].rank(), 3 });
 		}
-		else {
+		else
+		{
 			spade++;
 			spade_cardranks.insert(spade_cardranks.begin(), { CommunityCards[x].rank(), 4 });
 		}
 	}
-	if (club >= 5) {
+	if (club >= 5)
+	{
 		sort(club_cardranks.begin(), club_cardranks.end());
 		if (club_cardranks[0].rank() == 1)
 			club_cardranks.push_back(Card{ 14, 1} );
@@ -175,13 +201,14 @@ vector<Card> HandRank::Flush(vector<Card> player, vector<Card> CommunityCards) {
 	}
 	else {
 		for (int a = 0; a < 5; a++) {
-			nothing.insert(nothing.begin(), 5, { 0,0 });
+			nothing.insert(nothing.begin(), 5, { 0, 0 });
 		}
 		return nothing;
 	}
 }
 
-vector<Card> HandRank::Straight(vector<Card> player, vector<Card> CommunityCards) {
+vector<Card> HandRank::Straight(vector<Card> player, vector<Card> CommunityCards)
+{
 	vector<Card>ordered;
 	vector<Card>best;
 	best.reserve(5);
@@ -208,146 +235,152 @@ vector<Card> HandRank::Straight(vector<Card> player, vector<Card> CommunityCards
 			return best;
 		}
 	}
-	/*
-	for (int x = 0; x < 4; x++) {
-		if ((ordered[x + 2].rank() == ordered[x].rank() + 2) && (ordered[x + 3].rank() == ordered[x].rank() + 3) && (ordered[x + 4].rank() == ordered[x].rank() + 4) && (ordered[x + 5].rank() == ordered[x].rank() + 5) && (ordered[x].rank() != 0)){
-			best.push_back(ordered[x + 5]);
-			best.push_back(ordered[x + 4]);
-			best.push_back(ordered[x + 3]);
-			best.push_back(ordered[x + 2]);
-			best.push_back(ordered[x]);
-			return best;
-		}
-	}
-	for (int z = 0; z < 4; z++) {
-		if ((ordered[z + 1].rank() == ordered[z].rank() + 1) && (ordered[z + 2].rank() == ordered[z].rank() + 2) && (ordered[z + 3].rank() == ordered[z].rank() + 3) && (ordered[z + 5].rank() == ordered[z].rank() + 5) && (ordered[z].rank() != 0)) {
-			best.push_back(ordered[x + 5]);
-			best.push_back(ordered[x + 4]);
-			best.push_back(ordered[x + 3]);
-			best.push_back(ordered[x + 2]);
-			best.push_back(ordered[x]);
-			return best;
-		}
-	}
-	*/
 	for (int a = 0; a < 5; a++) {
 		best.insert(best.begin(), { 0,0 });
 	}
 	return best;
 }
 
-vector<Card> HandRank::ThreeOfAKind(vector<Card> player, vector<Card> CommunityCards) {
+vector<Card> HandRank::ThreeOfAKind(vector<Card> player, vector<Card> CommunityCards)
+{
 	vector<Card>ordered;
 	vector<Card>best;
 	best.reserve(5);
-	ordered.reserve(8);
+	ordered.reserve(7);
 	ordered.insert(ordered.end(), player.begin(), player.end());
 	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
+
+	for(int i=0; i<ordered.size(); i++)
+	{
+        if(ordered[i].rank() == 1)
+        {
+            ordered[i].set_rank(14);
+        }
+	}
+
 	sort(ordered.begin(), ordered.end());
-	for (int y = 0; y < 5; y++) {
-		if ((ordered[y + 1].rank() == ordered[y].rank()) && (ordered[y + 2].rank() == ordered[y].rank())) {
-			if (ordered[y].rank() == 1) {
-				best.insert(best.begin(), 3, { 14,0 });
-				best.push_back(ordered[ordered.size() -1]);
-				best.push_back(ordered[ordered.size() -2]);
-				return best;
-			}
-			else {
-				best.insert(best.begin(), 3, ordered[y]);
-				if (ordered[y].rank() != ordered.back().rank()) {
-					best.push_back(ordered[ordered.size()-1]);
-					best.push_back(ordered[ordered.size()-2]);
-					return best;
-				}
-				else {
-					best.push_back(ordered[ordered.size()-4]);
-					best.push_back(ordered[ordered.size()-5]);
-					return best;
-				}
-			}
+	reverse(ordered.begin(), ordered.end());
+
+	for (int i = 0; i < 5; i++)
+	{
+		if (ordered[i].rank() == ordered[i + 1].rank()
+            && ordered[i + 2].rank() == ordered[i + 1].rank())
+		{
+            best.insert(best.begin(), ordered.begin() + i, ordered.begin() + (i + 3));
+            ordered.erase(ordered.begin() + i, ordered.begin() + (i + 3));
+            best.insert(best.end(), ordered.begin(), ordered.begin() + 2);
+
+            return best;
+		}
+	}
+
+	best.insert(best.begin(), 5, { 0,0 });
+	return best;
+}
+
+vector<Card> HandRank::TwoPair(vector<Card> player, vector<Card> CommunityCards)
+{
+	vector<Card>ordered;
+	vector<Card>best;
+	best.reserve(5);
+	ordered.reserve(7);
+	ordered.insert(ordered.end(), player.begin(), player.end());
+	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
+
+	for(int i=0; i<ordered.size(); i++)
+	{
+        if(ordered[i].rank() == 1)
+        {
+            ordered[i].set_rank(14);
+        }
+	}
+
+	sort(ordered.begin(), ordered.end());
+	reverse(ordered.begin(), ordered.end());
+
+	for(int i=0; i<4; i++)
+	{
+        if(ordered[i].rank() == ordered[i+1].rank())
+        {
+            for(int j=i+2; j<6; j++)
+            {
+                if(ordered[j].rank() == ordered[j+1].rank())
+                {
+                    best.insert(best.begin(), ordered.begin() + i, ordered.begin() + (i + 2));
+                    best.insert(best.end(), ordered.begin() + j, ordered.begin() + (j + 2));
+
+                    ordered.erase(ordered.begin() + i, ordered.begin() + (i + 2));
+                    ordered.erase(ordered.begin() + (j - 2), ordered.begin() + j);
+
+                    best.push_back(ordered[0]);
+
+                    return best;
+                }
+            }
+        }
+	}
+
+	best.insert(best.begin(), 5, { 0,0 });
+	return best;
+}
+
+vector<Card> HandRank::OnePair(vector<Card> player, vector<Card> CommunityCards)
+{
+	vector<Card>ordered;
+	vector<Card>best;
+	best.reserve(5);
+	ordered.reserve(7);
+	ordered.insert(ordered.end(), player.begin(), player.end());
+	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
+
+	for(int i=0; i<ordered.size(); i++)
+	{
+        if(ordered[i].rank() == 1)
+        {
+            ordered[i].set_rank(14);
+        }
+	}
+
+	sort(ordered.begin(), ordered.end());
+	reverse(ordered.begin(), ordered.end());
+
+
+	for (int i = 0; i < 6; i++)
+	{
+		if (ordered[i].rank() == ordered[i + 1].rank())
+		{
+            best.insert(best.begin(), ordered.begin() + i, ordered.begin() + (i + 2));
+            ordered.erase(ordered.begin() + i, ordered.begin() + (i + 2));
+            best.insert(best.end(), ordered.begin(), ordered.begin() + 3);
+
+            return best;
 		}
 	}
 	best.insert(best.begin(), 5, { 0,0 });
 	return best;
 }
 
-vector<Card> HandRank::TwoPair(vector<Card> player, vector<Card> CommunityCards) {
+vector<Card> HandRank::HighCard(vector<Card> player, vector<Card> CommunityCards)
+{
 	vector<Card>ordered;
 	vector<Card>best;
 	best.reserve(5);
+	ordered.reserve(7);
 	ordered.insert(ordered.end(), player.begin(), player.end());
 	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
-	sort(ordered.begin(), ordered.end());
-	for (int y = 0; y < 3; y++) {
-		for (int x = 0; x < 4; x++) {
-			if ((ordered[6 - y].rank() == ordered[5 - y].rank()) && (ordered[4 - x].rank() == ordered[3 - x].rank()) && (ordered[5 - y].rank() != ordered[3 - x].rank())) {
-				best.insert(best.begin(), 2, ordered[6 - y]);
-				if (ordered[3 - x].rank() != 1)
-					best.insert(best.end(), 2, ordered[3 - x]);
-				else
-					best.insert(best.begin(), 2, { 14, 0 });
-				ordered[6 - y] = { 0,0 };
-				ordered[5 - y] = { 0,0 };
-				ordered[3 - x] = { 0,0 };
-				ordered[4 - x] = { 0,0 };
-				sort(ordered.begin(), ordered.end());
-				reverse(ordered.begin(), ordered.end());
-				best.push_back(ordered[0]);
-				return best;
-			}
-		}
-	}
-	best.insert(best.begin(), 5, { 0,0 });
-	return best;
-}
 
-vector<Card> HandRank::OnePair(vector<Card> player, vector<Card> CommunityCards) {
-	vector<Card>ordered;
-	vector<Card>best;
-	best.reserve(5);
-	ordered.reserve(8);
-	ordered.insert(ordered.end(), player.begin(), player.end());
-	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
-	sort(ordered.begin(), ordered.end());
-	for (int y = 0; y < 6; y++) {
-		if (ordered[y].rank() == ordered[y + 1].rank()) {
-			if (ordered[y].rank() == 1) {
-				ordered.erase(ordered.begin(), ordered.begin() + 1);
-				ordered.insert(ordered.end(), 2, { 14, 0 });
-				reverse(ordered.begin(), ordered.end());
-				best.insert(best.begin(), ordered.begin(), ordered.begin() + 4);
-				return best;
-			}
-			else {
-				best.insert(best.begin(), ordered.begin()+y, ordered.begin()+ (y+ 1));
-				ordered.erase(ordered.begin()+y, ordered.begin()+y+1);
-				reverse(ordered.begin(), ordered.end());
-				best.insert(best.end(), ordered.begin(), ordered.begin() + 2);
-				return best;
-			}
-		}
+	for(int i=0; i<ordered.size(); i++)
+	{
+        if(ordered[i].rank() == 1)
+        {
+            ordered[i].set_rank(14);
+        }
 	}
-	best.insert(best.begin(), 5, { 0,0 });
-	return best;
-}
 
-vector<Card> HandRank::HighCard(vector<Card> player, vector<Card> CommunityCards) {
-	vector<Card>ordered;
-	vector<Card>best;
-	best.reserve(5);
-	ordered.reserve(8);
-	ordered.insert(ordered.end(), player.begin(), player.end());
-	ordered.insert(ordered.end(), CommunityCards.begin(), CommunityCards.end());
 	sort(ordered.begin(), ordered.end());
-	if (ordered[0].rank() == 1) {
-		ordered.erase(ordered.begin());
-		ordered.push_back(Card{ 14 ,0 });
-		reverse(ordered.begin(), ordered.end());
-		best.insert(best.begin(), ordered.begin(), ordered.begin() + 5);
-	}
-	else {
-		reverse(ordered.begin(), ordered.end());
-		best.insert(best.begin(), ordered.begin(), ordered.begin() + 5);
-	}
+	reverse(ordered.begin(), ordered.end());
+
+    best.insert(best.begin(), ordered.begin(), ordered.begin() + 5);
+
 	return best;
 }

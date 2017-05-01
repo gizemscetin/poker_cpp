@@ -119,7 +119,7 @@ void PokerNetwork::next_population()
 
     for (int i = 0; i < children.size(); ++i)
     {
-        children[i].mutate(mutation_rate, 100.0);
+        children[i].mutate(mutation_rate, 1.0);
         pair<float, Organism> p1;
         p1.first = 0;
         p1.second = children[i];

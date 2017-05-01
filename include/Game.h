@@ -21,7 +21,7 @@ class Game
         void show_status();
         void show_player_pockets();
 
-        void start(bool io_on);
+        void start(bool io_on, int num_rounds);
         void play_one_round(bool io_on);
         bool play_one_state(vector<Card> community_cards, int state, bool io_on);
 

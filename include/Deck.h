@@ -25,6 +25,8 @@ class Card
         int suit() const { return suit_; };
         vector<float> get_card_info();
 
+        void set_rank(int rank) { rank_ = rank; };
+
         friend bool operator==(const Card& lhs, const Card& rhs){ return (lhs.rank() == rhs.rank()) && (lhs.suit() == rhs.suit()); }
         friend bool operator!=(const Card& lhs, const Card& rhs){ return !(lhs == rhs); }
         friend bool operator<(const Card& lhs, const Card& rhs) {return lhs.rank() < rhs.rank(); };

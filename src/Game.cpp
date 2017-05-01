@@ -133,6 +133,9 @@ void Game::play_one_round(bool io_on)
                 D.deal_river();
                 if(io_on)
                     cout << D << endl;
+                play_one_state(D.community_cards(), 1, io_on);   // Post-river
+                if(io_on)
+                    cout << endl << endl;
             }
         }
     }
@@ -173,12 +176,12 @@ void Game::play_one_round(bool io_on)
         show_status();
 }
 
-void Game::start(bool io_on)
+void Game::start(bool io_on, int num_rounds)
 {
     bool game_end = false;
 	int	round_cnt = 0;
 
-    while(round_cnt < 5)
+    while(round_cnt < num_rounds)
     {
         if(io_on)
         {
@@ -210,6 +213,146 @@ void Game::start(bool io_on)
         show_status();
 }
 
+/*
+int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards, bool io_on)
+{
+    HandRank H;
+
+    vector<Card> pl1_best, pl2_best;
+    int pl1_rank, pl2_rank;
+    int result;
+
+    pl1_best = H.RoyalFlush(P1, CommunityCards);
+    pl1_rank = 9;
+    if(pl1_best[0].rank() == 0)
+    {
+        pl1_best = H.StraightFlush(P1, CommunityCards);
+        pl1_rank--;
+        if(pl1_best[0].rank() == 0)
+        {
+            pl1_best = H.FourOfAKind(P1, CommunityCards);
+            pl1_rank--;
+            if(pl1_best[0].rank() == 0)
+            {
+                pl1_best = H.FullHouse(P1, CommunityCards);
+                pl1_rank--;
+                if(pl1_best[0].rank() == 0)
+                {
+                    pl1_best = H.Flush(P1, CommunityCards);
+                    pl1_rank--;
+                    if(pl1_best[0].rank() == 0)
+                    {
+                        pl1_best = H.Straight(P1, CommunityCards);
+                        pl1_rank--;
+                        if(pl1_best[0].rank() == 0)
+                        {
+                            pl1_best = H.ThreeOfAKind(P1, CommunityCards);
+                            pl1_rank--;
+                            if(pl1_best[0].rank() == 0)
+                            {
+                                pl1_best = H.TwoPair(P1, CommunityCards);
+                                pl1_rank--;
+                                if(pl1_best[0].rank() == 0)
+                                {
+                                    pl1_best = H.OnePair(P1, CommunityCards);
+                                    pl1_rank--;
+                                    if(pl1_best[0].rank() == 0)
+                                    {
+                                        pl1_best = H.HighCard(P1, CommunityCards);
+                                        pl1_rank--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    pl2_best = H.RoyalFlush(P1, CommunityCards);
+    pl2_rank = 9;
+    if(pl2_best[0].rank() == 0)
+    {
+        pl2_best = H.StraightFlush(P1, CommunityCards);
+        pl2_rank--;
+        if(pl2_best[0].rank() == 0)
+        {
+            pl2_best = H.FourOfAKind(P1, CommunityCards);
+            pl2_rank--;
+            if(pl2_best[0].rank() == 0)
+            {
+                pl2_best = H.FullHouse(P1, CommunityCards);
+                pl2_rank--;
+                if(pl2_best[0].rank() == 0)
+                {
+                    pl2_best = H.Flush(P1, CommunityCards);
+                    pl2_rank--;
+                    if(pl2_best[0].rank() == 0)
+                    {
+                        pl2_best = H.Straight(P1, CommunityCards);
+                        pl2_rank--;
+                        if(pl2_best[0].rank() == 0)
+                        {
+                            pl2_best = H.ThreeOfAKind(P1, CommunityCards);
+                            pl2_rank--;
+                            if(pl2_best[0].rank() == 0)
+                            {
+                                pl2_best = H.TwoPair(P1, CommunityCards);
+                                pl2_rank--;
+                                if(pl2_best[0].rank() == 0)
+                                {
+                                    pl2_best = H.OnePair(P1, CommunityCards);
+                                    pl2_rank--;
+                                    if(pl2_best[0].rank() == 0)
+                                    {
+                                        pl2_best = H.HighCard(P1, CommunityCards);
+                                        pl2_rank--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(io_on)
+    {
+        for(int i=0; i<pl1_best.size(); i++)
+        {
+            cout << pl1_best[i];
+        }
+        cout << endl;
+        for(int i=0; i<pl2_best.size(); i++)
+        {
+            cout << pl2_best[i];
+        }
+    }
+
+    if(pl1_rank > pl2_rank)
+    {
+        result = 0;
+        if(io_on)
+            cout << "Player 1 won with a " << HandRankIOMap[pl1_rank] << endl;
+    }
+    else if(pl1_rank < pl2_rank)
+    {
+        result = 1;
+        if(io_on)
+            cout << "Player 2 won with a " << HandRankIOMap[pl2_rank] << endl;
+    }
+    else
+    {
+        if(pl1_rank == 7) //Four of a kind
+        {
+
+        }
+    }
+}
+*/
+
 int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCards, bool io_on)
 {
     if(io_on)
@@ -228,17 +371,33 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
     {
         if(io_on)
+        {
             cout << "Royal Flush" << endl;
+            for(int i=0; i<pl1_best.size(); i++)
+            {
+                cout << pl1_best[i];
+            }
+            cout << endl;
+            for(int i=0; i<pl2_best.size(); i++)
+            {
+                cout << pl2_best[i];
+            }
+        }
         if(pl1_best[0].rank() > pl2_best[0].rank())
         {
             result = 0;
+            return result;
         }
         else if(pl1_best[0].rank() < pl2_best[0].rank())
         {
             result = 1;
+            return result;
         }
         else
-            result = 0;
+        {
+            result = -1;
+            return result;
+        }
     }
     else
     {
@@ -248,17 +407,34 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
         if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
         {
             if(io_on)
+            {
                 cout << "Straight Flush" << endl;
+                for(int i=0; i<pl1_best.size(); i++)
+                {
+                    cout << pl1_best[i];
+                }
+                cout << endl;
+                for(int i=0; i<pl2_best.size(); i++)
+                {
+                    cout << pl2_best[i];
+                }
+                cout << endl;
+            }
             if(pl1_best[0].rank() > pl2_best[0].rank())
             {
                 result = 0;
+                return result;
             }
             else if(pl1_best[0].rank() < pl2_best[0].rank())
             {
                 result = 1;
+                return result;
             }
             else
-                result = 0;
+            {
+                result = -1;
+                return result;
+            }
         }
 
         else
@@ -268,17 +444,46 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
             if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
             {
-                if(io_on) cout << "Four Of A Kind" << endl;
+                if(io_on)
+                {
+                    cout << "Four Of A Kind" << endl;
+                    for(int i=0; i<pl1_best.size(); i++)
+                    {
+                        cout << pl1_best[i];
+                    }
+                    cout << endl;
+                    for(int i=0; i<pl2_best.size(); i++)
+                    {
+                        cout << pl2_best[i];
+                    }
+                    cout << endl;
+                }
                 if(pl1_best[0].rank() > pl2_best[0].rank())
                 {
                     result = 0;
+                    return result;
                 }
                 else if(pl1_best[0].rank() < pl2_best[0].rank())
                 {
                     result = 1;
+                    return result;
                 }
                 else
-                    result = 0;
+                {
+                    if(pl1_best[4].rank() > pl2_best[4].rank())
+                    {
+                        result = 0;
+                    }
+                    else if(pl1_best[4].rank() < pl2_best[4].rank())
+                    {
+                        result = 1;
+                    }
+                    else
+                    {
+                        result = -1;
+                        return result;
+                    }
+                }
             }
             else
             {
@@ -287,17 +492,35 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                 if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                 {
-                    if(io_on) cout << "Full House" << endl;
+                    if(io_on)
+                    {
+                        cout << "Full House" << endl;
+                        for(int i=0; i<pl1_best.size(); i++)
+                        {
+                            cout << pl1_best[i];
+                        }
+                        cout << endl;
+                        for(int i=0; i<pl2_best.size(); i++)
+                        {
+                            cout << pl2_best[i];
+                        }
+                        cout << endl;
+                    }
                     if(pl1_best[0].rank() > pl2_best[0].rank())
                     {
                         result = 0;
+                        return result;
                     }
                     else if(pl1_best[0].rank() < pl2_best[0].rank())
                     {
                         result = 1;
+                        return result;
                     }
                     else
-                        result = 0;
+                    {
+                        result = -1;
+                        return result;
+                    }
                 }
                 else
                 {
@@ -306,17 +529,35 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                     {
-                        if(io_on) cout << "Flush" << endl;
+                        if(io_on)
+                        {
+                            cout << "Flush" << endl;
+                            for(int i=0; i<pl1_best.size(); i++)
+                            {
+                                cout << pl1_best[i];
+                            }
+                            cout << endl;
+                            for(int i=0; i<pl2_best.size(); i++)
+                            {
+                                cout << pl2_best[i];
+                            }
+                            cout << endl;
+                        }
                         if(pl1_best[0].rank() > pl2_best[0].rank())
                         {
                             result = 0;
+                            return result;
                         }
                         else if(pl1_best[0].rank() < pl2_best[0].rank())
                         {
                             result = 1;
+                            return result;
                         }
                         else
-                            result = 0;
+                        {
+                            result = -1;
+                            return result;
+                        }
                     }
                     else
                     {
@@ -325,17 +566,35 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                         if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                         {
-                            if(io_on) cout << "Straight" << endl;
+                            if(io_on)
+                            {
+                                cout << "Straight" << endl;
+                                for(int i=0; i<pl1_best.size(); i++)
+                                {
+                                    cout << pl1_best[i];
+                                }
+                                cout << endl;
+                                for(int i=0; i<pl2_best.size(); i++)
+                                {
+                                    cout << pl2_best[i];
+                                }
+                                cout << endl;
+                            }
                             if(pl1_best[0].rank() > pl2_best[0].rank())
                             {
                                 result = 0;
+                                return result;
                             }
                             else if(pl1_best[0].rank() < pl2_best[0].rank())
                             {
                                 result = 1;
+                                return result;
                             }
                             else
-                                result = 0;
+                            {
+                                result = -1;
+                                return result;
+                            }
                         }
                         else
                         {
@@ -344,27 +603,58 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                             if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                             {
-                                if(io_on) cout << "Three of a kind" << endl;
+                                if(io_on)
+                                {
+                                    cout << "Three of a kind" << endl;
+                                    for(int i=0; i<pl1_best.size(); i++)
+                                    {
+                                        cout << pl1_best[i];
+                                    }
+                                    cout << endl;
+                                    for(int i=0; i<pl2_best.size(); i++)
+                                    {
+                                        cout << pl2_best[i];
+                                    }
+                                    cout << endl;
+                                }
                                 if(pl1_best[0].rank() > pl2_best[0].rank())
                                 {
                                     result = 0;
+                                    return result;
                                 }
                                 else if(pl1_best[0].rank() < pl2_best[0].rank())
                                 {
                                     result = 1;
+                                    return result;
                                 }
                                 else // Check Kicker
                                 {
                                     if(pl1_best[3].rank() > pl2_best[3].rank())
                                     {
                                         result = 0;
+                                        return result;
                                     }
                                     else if(pl1_best[3].rank() < pl2_best[3].rank())
                                     {
                                         result = 1;
+                                        return result;
                                     }
                                     else
-                                        result = -1;
+                                    {
+                                        if(pl1_best[4].rank() > pl2_best[4].rank())
+                                        {
+                                            result = 0;
+                                            return result;
+                                        }
+                                        else if(pl1_best[4].rank() < pl2_best[4].rank())
+                                        {
+                                            result = 1;
+                                            return result;
+                                        }
+                                        else
+                                            result = -1;
+                                            return result;
+                                        }
                                 }
                             }
                             else
@@ -372,39 +662,62 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
                                 pl1_best = H.TwoPair(P1, CommunityCards);
                                 pl2_best = H.TwoPair(P2, CommunityCards);
 
-                                if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
+                                if((pl1_best[0].rank() != 0 && pl1_best[2].rank() != 0) ||
+                                   (pl2_best[0].rank() != 0 && pl2_best[2].rank() != 0))
                                 {
-                                    if(io_on) cout << "Two Pairs" << endl;
+                                    if(io_on)
+                                    {
+                                        cout << "Two Pairs" << endl;
+                                        for(int i=0; i<pl1_best.size(); i++)
+                                        {
+                                            cout << pl1_best[i];
+                                        }
+                                        cout << endl;
+                                        for(int i=0; i<pl2_best.size(); i++)
+                                        {
+                                            cout << pl2_best[i];
+                                        }
+                                        cout << endl;
+                                    }
                                     if(pl1_best[0].rank() > pl2_best[0].rank())
                                     {
                                         result = 0;
+                                        return result;
                                     }
                                     else if(pl1_best[0].rank() < pl2_best[0].rank())
                                     {
                                         result = 1;
+                                        return result;
                                     }
                                     else // Check Kicker
                                     {
                                         if(pl1_best[2].rank() > pl2_best[2].rank())
                                         {
                                             result = 0;
+                                            return result;
                                         }
                                         else if(pl1_best[2].rank() < pl2_best[2].rank())
                                         {
                                             result = 1;
+                                            return result;
                                         }
                                         else // Check Kicker
                                         {
                                             if(pl1_best[4].rank() > pl2_best[4].rank())
                                             {
                                                 result = 0;
+                                                return result;
                                             }
                                             else if(pl1_best[4].rank() < pl2_best[4].rank())
                                             {
                                                 result = 1;
+                                                return result;
                                             }
                                             else
+                                            {
                                                 result = -1;
+                                                return result;
+                                            }
                                         }
                                     }
                                 }
@@ -415,60 +728,163 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
                                     if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
                                     {
-                                        if(io_on) cout << "One Pair" << endl;
+                                        if(io_on)
+                                        {
+                                            cout << "One Pair" << endl;
+                                            for(int i=0; i<pl1_best.size(); i++)
+                                            {
+                                                cout << pl1_best[i];
+                                            }
+                                            cout << endl;
+                                            for(int i=0; i<pl2_best.size(); i++)
+                                            {
+                                                cout << pl2_best[i];
+                                            }
+                                            cout << endl;
+                                        }
                                         if(pl1_best[0].rank() > pl2_best[0].rank())
                                         {
                                             result = 0;
+                                            return result;
                                         }
                                         else if(pl1_best[0].rank() < pl2_best[0].rank())
                                         {
                                             result = 1;
+                                            return result;
                                         }
                                         else // Check Kicker
                                         {
                                             if(pl1_best[2].rank() > pl2_best[2].rank())
                                             {
                                                 result = 0;
+                                                return result;
                                             }
                                             else if(pl1_best[2].rank() < pl2_best[2].rank())
                                             {
                                                 result = 1;
+                                                return result;
                                             }
                                             else
-                                                result = -1;
+                                            {
+                                                if(pl1_best[3].rank() > pl2_best[3].rank())
+                                                {
+                                                    result = 0;
+                                                    return result;
+                                                }
+                                                else if(pl1_best[3].rank() < pl2_best[3].rank())
+                                                {
+                                                    result = 1;
+                                                    return result;
+                                                }
+                                                else
+                                                {
+                                                    if(pl1_best[4].rank() > pl2_best[4].rank())
+                                                    {
+                                                        result = 0;
+                                                        return result;
+                                                    }
+                                                    else if(pl1_best[4].rank() < pl2_best[4].rank())
+                                                    {
+                                                        result = 1;
+                                                        return result;
+                                                    }
+                                                    else
+                                                    {
+                                                        result = -1;
+                                                        return result;
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                     else
                                     {
                                         pl1_best = H.HighCard(P1, CommunityCards);
                                         pl2_best = H.HighCard(P2, CommunityCards);
-                                        if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
-                                        {
-                                            if(io_on) cout << "High Card" << endl;
+                                        //if(pl1_best[0].rank() != 0 || pl2_best[0].rank() != 0)
+                                        //{
+                                            if(io_on)
+                                            {
+                                                cout << "High Card" << endl;
+                                                for(int i=0; i<pl1_best.size(); i++)
+                                                {
+                                                    cout << pl1_best[i];
+                                                }
+                                                cout << endl;
+                                                for(int i=0; i<pl2_best.size(); i++)
+                                                {
+                                                    cout << pl2_best[i];
+                                                }
+                                                cout << endl;
+                                            }
                                             if(pl1_best[0].rank() > pl2_best[0].rank())
                                             {
                                                 result = 0;
+                                                return result;
                                             }
                                             else if(pl1_best[0].rank() < pl2_best[0].rank())
                                             {
                                                 result = 1;
+                                                return result;
                                             }
                                             else
                                             {
                                                 if(pl1_best[1].rank() > pl2_best[1].rank())
                                                 {
                                                     result = 0;
+                                                    return result;
                                                 }
                                                 else if(pl1_best[1].rank() < pl2_best[1].rank())
                                                 {
                                                     result = 1;
+                                                    return result;
                                                 }
                                                 else
                                                 {
-                                                    result = -1;
+                                                    if(pl1_best[2].rank() > pl2_best[2].rank())
+                                                    {
+                                                        result = 0;
+                                                        return result;
+                                                    }
+                                                    else if(pl1_best[2].rank() < pl2_best[2].rank())
+                                                    {
+                                                        result = 1;
+                                                        return result;
+                                                    }
+                                                    else
+                                                    {
+                                                        if(pl1_best[3].rank() > pl2_best[3].rank())
+                                                        {
+                                                            result = 0;
+                                                            return result;
+                                                        }
+                                                        else if(pl1_best[3].rank() < pl2_best[3].rank())
+                                                        {
+                                                            result = 1;
+                                                            return result;
+                                                        }
+                                                        else
+                                                        {
+                                                            if(pl1_best[4].rank() > pl2_best[4].rank())
+                                                            {
+                                                                result = 0;
+                                                                return result;
+                                                            }
+                                                            else if(pl1_best[4].rank() < pl2_best[4].rank())
+                                                            {
+                                                                result = 1;
+                                                                return result;
+                                                            }
+                                                            else
+                                                            {
+                                                                result = -1;
+                                                                return result;
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        }
+                                        //}
                                     }
                                 }
                             }
@@ -481,189 +897,4 @@ int Game::find_winner(vector<Card> P1, vector<Card> P2, vector<Card> CommunityCa
 
     return result;
 }
-/*
-    int result;
-	if ((H.RoyalFlush(P1, CommunityCards))[0].rank() != 0 || (H.RoyalFlush(P2, CommunityCards))[0].rank() != 0) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.RoyalFlush(P1, CommunityCards))[n].rank() > (H.RoyalFlush(P2, CommunityCards))[n].rank()) {
-				result =  0; //Player 1 is the Winner (Royal Flush)
-				break;
-			}
-			if ((H.RoyalFlush(P1, CommunityCards))[n].rank() < (H.RoyalFlush(P2, CommunityCards))[n].rank()) {
-				result =  1; //Player 2 is the Winner (Royal Flush)
-				break;
-			}
-		}
-		//cout << "End find_winner()" << endl;
-		result =   -1; //It's a Tie (Royal Flush)
-	}
-	else if (((H.StraightFlush(P1, CommunityCards))[0].rank() != 0) || ((H.StraightFlush(P2, CommunityCards))[0].rank() != 0)) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.StraightFlush(P1, CommunityCards))[n].rank() > (H.StraightFlush(P2, CommunityCards))[n].rank()) {
-				result =   0; //Player 1 is the Winner (Straight Flush)
-				break;
-			}
-			if ((H.StraightFlush(P1, CommunityCards))[n].rank() < (H.StraightFlush(P2, CommunityCards))[n].rank()) {
-				result =   1; //Player 2 is the Winner (Straight Flush)
-				break;
-			}
-		}
-		//cout << "End find_winner()" << endl;
-		result =   -1; //It's a Tie (Straight Flush)
-	}
-	else if (((H.FourOfAKind(P1, CommunityCards))[0].rank() != 0) || (H.FourOfAKind(P2, CommunityCards))[0].rank() != 0) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.FourOfAKind(P1, CommunityCards))[n].rank() > (H.FourOfAKind(P2, CommunityCards))[n].rank())
-			{
-                result =   0; //Player 1 is the Winner (Four of a Kind)
-                break;
-            }
-			if ((H.FourOfAKind(P1, CommunityCards))[n].rank() < (H.FourOfAKind(P2, CommunityCards))[n].rank())
-			{
-				result =   1; //Player 2 is the Winner (Four of a Kind)
-				break;
-            }
-		}
-		//cout << "End find_winner()" << endl;
-		result =  -1; //It's a Tie (Four of a Kind)
-	}
-	else if (((H.FullHouse(P1, CommunityCards))[0].rank() != 0) || ((H.FullHouse(P2, CommunityCards))[0].rank() != 0)) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.FullHouse(P1, CommunityCards))[n].rank() > (H.FullHouse(P2, CommunityCards))[n].rank())
-			{
-				result =   0; //Player 1 is the Winner (Full House)
-				break;
-            }
-			if ((H.FullHouse(P1, CommunityCards))[n].rank() < (H.FullHouse(P2, CommunityCards))[n].rank())
-			{
-				result =   1; //Player 2 is the Winner (Full House)
-				break;
-            }
-		}
-		//cout << "End find_winner()" << endl;
-		result =  -1; //It's a Tie (Full House)
-	}
-	else if (((H.Flush(P1, CommunityCards))[0].rank() != 0) || ((H.Flush(P2, CommunityCards))[0].rank() != 0)) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.Flush(P1, CommunityCards))[n].rank() > (H.Flush(P2, CommunityCards))[n].rank())
-			{
-				result =   0; //Player 1 is the Winner (Flush)
-				break;
-            }
-			if ((H.Flush(P1, CommunityCards))[n].rank() < (H.Flush(P2, CommunityCards))[n].rank())
-			{
-				result =   1; //Player 2 is the Winner (Flush)
-				break;
-            }
-		}
-		//cout << "End find_winner()" << endl;
-		result =   -1; //It's a Tie (Flush)
-	}
-	else if (((H.Straight(P1, CommunityCards))[0].rank() != 0) || ((H.Straight(P2, CommunityCards))[0].rank() != 0)) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.Straight(P1, CommunityCards))[n].rank() > (H.Straight(P2, CommunityCards))[n].rank())
-			{
-				result =   0; //Player 1 is the Winner (Straight)
-				break;
-            }
-			if ((H.Straight(P1, CommunityCards))[n].rank() < (H.Straight(P2, CommunityCards))[n].rank())
-			{
-				result =   1; //Player 2 is the Winner (Straight)
-				break;
-            }
-		}
-		//cout << "End find_winner()" << endl;
-		result =   -1; //It's a Tie (Straight)
-	}
-	else if (((H.ThreeOfAKind(P1, CommunityCards))[0].rank() != 0) || ((H.ThreeOfAKind(P2, CommunityCards))[0].rank() != 0)) {
-		if ((H.ThreeOfAKind(P1, CommunityCards))[0].rank() > (H.ThreeOfAKind(P2, CommunityCards))[0].rank())
-			result =   0; //Player 1 is the Winner (Three of a Kind)
-		else if ((H.ThreeOfAKind(P1, CommunityCards))[0].rank() < (H.ThreeOfAKind(P2, CommunityCards))[0].rank())
-			result =   1; //Player 2 is the Winner (Three of a Kind)
-		else {
-			for (int n = 0; n < 2; n++) {
-				if ((H.ThreeOfAKind(P1, CommunityCards))[3 + n].rank() > (H.ThreeOfAKind(P2, CommunityCards))[3 + n].rank())
-				{
-					result =   0; //Player 1 is the Winner (Three of a Kind High Kicker)
-					break;
-                }
-				if ((H.ThreeOfAKind(P1, CommunityCards))[3 + n].rank() < (H.ThreeOfAKind(P2, CommunityCards))[3 + n].rank())
-				{
-					result =   1; //Player 2 is the Winner (Three of a Kind High Kicker)
-					break;
-                }
-			}
-			//cout << "End find_winner()" << endl;
-			result =   -1; //It's a Tie (Three of a Kind)
-		}
-	}
-	else if ((((H.TwoPair(P1, CommunityCards))[0].rank() != 0) && ((H.TwoPair(P1, CommunityCards))[2].rank() != 0)) || (((H.TwoPair(P2, CommunityCards)[0].rank() != 0)) && (H.TwoPair(P2, CommunityCards)[2].rank() != 0))) {
-		for (int n = 0; n < 5; n++) {
-			if ((H.TwoPair(P1, CommunityCards))[n].rank() > (H.TwoPair(P2, CommunityCards))[n].rank())
-			{
-				result =   0; //Player 1 is the Winner (Two Pair)
-				break;
-                }
-			if ((H.TwoPair(P1, CommunityCards))[n].rank() < (H.TwoPair(P2, CommunityCards))[n].rank())
-			{
-				result =   1; //Player 2 is the Winner (Two Pair)
-				break;
-                }
 
-            if(n == 4)
-            {
-                if ((H.TwoPair(P1, CommunityCards))[4].rank() > (H.TwoPair(P2, CommunityCards))[4].rank())
-                    result =   0; //Player 1 is the Winner (Two Pair High Kicker)
-                else if ((H.TwoPair(P1, CommunityCards))[4].rank() < (H.TwoPair(P2, CommunityCards))[4].rank())
-                    result =   1; //Player 2 is the Winner (Two Pair High Kicker)
-                else
-                {
-                    //cout << "End find_winner()" << endl;
-                    result =   -1; //It's a Tie (Two Pair)
-                }
-            }
-		}
-
-	}
-	else if (((H.OnePair(P1, CommunityCards))[0].rank() != 0) || ((H.OnePair(P2, CommunityCards))[0].rank() != 0)) {
-		if ((H.OnePair(P1, CommunityCards))[0].rank() > (H.OnePair(P2, CommunityCards))[0].rank())
-			result =   0; //Player 1 is the Winner (One Pair)
-		else if ((H.OnePair(P1, CommunityCards))[0].rank() < (H.OnePair(P2, CommunityCards))[0].rank())
-			result =   1; //Player 2 is the Winner (One Pair)
-		else {
-			for (int n = 0; n < 5; n++) {
-				if ((H.HighCard(P1, CommunityCards))[(n)].rank() > (H.HighCard(P2, CommunityCards))[(n)].rank())
-				{
-					result =   0; //Player 1 is the Winner (One Pair High Kicker)
-					break;
-                }
-				if ((H.HighCard(P1, CommunityCards))[(n)].rank() < (H.HighCard(P2, CommunityCards))[(n)].rank())
-				{
-					result =   1; //Player 2 is the Winner (One Pair High Kicker)
-					break;
-                }
-			}
-			//cout << "End find_winner()" << endl;
-			result =   -1; //It's a Tie (One Pair)
-		}
-	}
-	else {
-		for (int n = 0; n < 5; n++) {
-			if ((H.HighCard(P1, CommunityCards))[(n)].rank() > (H.HighCard(P2, CommunityCards))[(n)].rank())
-			{
-				result =   0; //Player 1 is the Winner (High Card)
-				break;
-				}
-			if ((H.HighCard(P1, CommunityCards))[(n)].rank() < (H.HighCard(P2, CommunityCards))[(n)].rank())
-			{
-				result =   1; //Player 2 is the Winner (High Card)
-				break;
-				}
-		}
-		//cout << "End find_winner()" << endl;
-		result =   -1; //It's a Tie (High Card)
-	}
-
-	cout << "End find_winner() : " << result << endl;
-	return result;
-	*/
